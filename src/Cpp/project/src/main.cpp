@@ -823,6 +823,56 @@ class StableDiffusion {
 };
 // STABLE DIFFUSION CLASS IS DEPRECATED
 
+// ----------------- Demo Functions -----------------
+
+void demoWhisper(std::string path) {
+  // demo of whisper model, without using the whisper class
+  std::cout << "Demo Whisper" << std::endl;
+  std::string device = getModelDevice();
+  ov::genai::WhisperPipeline pipe(whisperModelPath.string(), device);
+  std::cout << "Whisper Pipeline initialised with the following settings: "
+            << std::endl;
+  std::cout << "Model Path: " << whisperModelPath << std::endl;
+  std::cout << "Device: " << device << std::endl;
+  std::cout << "Song ID: " << path << std::endl;
+  std::cout << "Setting generation config" << std::endl;
+  ov::genai::WhisperGenerationConfig config = pipe.get_generation_config();
+  config.max_new_tokens = 500;
+  config.language = "<|en|>";
+  config.task = "transcribe";
+  config.return_timestamps = true;
+  std::cout << "Obtaining wav as raw input" << std::endl;
+  ov::genai::RawSpeechInput rawSpeech = utils::audio::read_wav(path);
+  std::cout << "Generating lyrics" << std::endl;
+  std::string lyrics = pipe.generate(rawSpeech, config);
+  std::cout << "Lyrics generated: " << std::endl;
+  std::cout << lyrics << std::endl;
+  std::string outputFilePath = (lyricsDirPath / (path + ".txt")).string();
+  std::ofstream outputFile(outputFilePath);
+  outputFile << lyrics;
+  outputFile.close();
+  std::cout << "Lyrics saved to file" << std::endl;
+  finishWhisper();
+  std::cout << "Finished Whisper" << std::endl;
+  std::cout << "Demo Whisper finished" << std::endl;
+  std::cout << "----------------------------------------" << std::endl;
+}
+void demoLLM(std::string prompt) {
+  // demo of LLM model, without using the LLM class
+  std::cout << "Demo LLM" << std::endl;
+  std::string device = getModelDevice();
+  ov::genai::LLMPipeline pipe(gemmaModelPath, device);
+  std::cout << "LLM Pipeline initialised with the following settings: "
+            << std::endl;
+  std::cout << "Model Path: " << gemmaModelPath << std::endl;
+  std::cout << "Device: " << device << std::endl;
+  std::string output = pipe.generate(prompt, ov::genai::max_new_tokens(500));
+  std::cout << "Output: " << output << std::endl;
+  finishLLM();
+  std::cout << "Finished LLM" << std::endl;
+  std::cout << "Demo LLM finished" << std::endl;
+  std::cout << "----------------------------------------" << std::endl;
+}
 
 // ----------------- Main Function -----------------
 int main(int argc, char *argv[]) {
@@ -858,6 +908,10 @@ int main(int argc, char *argv[]) {
     --generateObjectPrompts: generate object image prompts
     --generateBackgroundPrompts: generate background image prompts
     --all: extract all llm features
+
+  New option only for demo
+    --demo-whisper: run demo mode with whisper model, requires path to audio
+    --demo-llm: run demo mode with llm model, requires prompt
   */
   po::options_description general_options("Allowed options");
   general_options.add_options()
@@ -870,6 +924,11 @@ int main(int argc, char *argv[]) {
       ("text_log", "enable text logging")
       ("model,m", po::value<std::string>(), "specify model name")
       ("electron,e", "enable electron mode");
+
+  // demo options
+  general_options.add_options()
+      ("demo-whisper", po::value<std::string>(), "run demo mode with whisper model, requires path to audio")
+      ("demo-llm", po::value<std::string>(), "run demo mode with llm model, requires prompt");
 
   po::options_description stable_diffusion_options(
       "Stable Diffusion only options");
@@ -986,6 +1045,18 @@ int main(int argc, char *argv[]) {
     vm.insert({"extractBackground", po::variable_value()});
     vm.insert({"generateObjectPrompts", po::variable_value()});
     vm.insert({"generateBackgroundPrompts", po::variable_value()});
+  }
+
+  // if demo flag is set, run demo mode
+  if (vm.count("demo-whisper")) {
+    std::string path = vm["demo-whisper"].as<std::string>();
+    demoWhisper(path);
+    return 0;
+  }
+  if (vm.count("demo-llm")) {
+    std::string prompt = vm["demo-llm"].as<std::string>();
+    demoLLM(prompt);
+    return 0;
   }
 
   // ================== Stable Diffusion Pipeline ==================
