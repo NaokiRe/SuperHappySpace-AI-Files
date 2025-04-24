@@ -157,8 +157,8 @@ After these steps, the openvino library will be installed on your machine and it
 Go to the external directory and run the following command:
 ```shell
 cd src/python
-pip install requirements.txt
-pyinstaller –F SD.py 
+pip install -r requirements.txt
+pyinstaller SD.py -F
 ```
 The build was done with python version 3.10.0. The executable will be in the `dist` folder. Move the executable to the `./` (root) folder to be used by the main application.
 
@@ -178,7 +178,7 @@ Navigate to the root directory of the project and run the following commands:
 ./cppVer.exe --demo-whisper "./assets/audio/TeQ_TTyLGMs.wav"
 
 # execute the sd demo, with the prompt as a string and the output file as a string
-./SD.exe --prompt "A cat in a hat" --output "./assets/images/cat_in_a_hat.png"
+./SD.exe --prompt "A cat in a hat"
 ```
 
 Note that the whisper demo will only work with .wav files of 16kHz sample rate. 

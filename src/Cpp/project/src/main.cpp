@@ -987,6 +987,18 @@ int main(int argc, char *argv[]) {
 
   std::cout << "Current Directory: " << currentDirectory << std::endl;
 
+  // if demo flag is set, run demo mode
+  if (vm.count("demo-whisper")) {
+    std::string path = vm["demo-whisper"].as<std::string>();
+    demoWhisper(path);
+    return 0;
+  }
+  if (vm.count("demo-llm")) {
+    std::string prompt = vm["demo-llm"].as<std::string>();
+    demoLLM(prompt);
+    return 0;
+  }
+
   /* ----------------- Check Flag Errors -----------------
   Checking flags for any errors before we go to main program
   i.e. any required flags that are not set
@@ -1047,17 +1059,7 @@ int main(int argc, char *argv[]) {
     vm.insert({"generateBackgroundPrompts", po::variable_value()});
   }
 
-  // if demo flag is set, run demo mode
-  if (vm.count("demo-whisper")) {
-    std::string path = vm["demo-whisper"].as<std::string>();
-    demoWhisper(path);
-    return 0;
-  }
-  if (vm.count("demo-llm")) {
-    std::string prompt = vm["demo-llm"].as<std::string>();
-    demoLLM(prompt);
-    return 0;
-  }
+
 
   // ================== Stable Diffusion Pipeline ==================
   // DEPRECATED
