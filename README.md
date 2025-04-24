@@ -166,4 +166,19 @@ The build was done with python version 3.10.0. The executable will be in the `di
 ## Demo commands
 WARNING: make sure the all required files are in the correct directories before running the commands. The AI models and libraries should be in the `AiResources` directory, and the executable files should be in the root directory. (structure shown in the project structure section above).
 
-There is 1 song in the asset by default "Do you want to build a snowman", with the id `TeQ_TTyLGMs` as a demo song. 
+Navigate to the root directory of the project and run the following commands:
+```shell
+./AiResources/openvino_2025/setupvars.ps1
+# or setupvars.bat for cmd systems
+
+# execute the llm demo, with the prompt as a string
+./cppVer.exe --demo-llm "What is the meaning of life?"
+
+# execute the whisper demo, with the audio file as a string
+./cppVer.exe --demo-whisper "./assets/audio/TeQ_TTyLGMs.wav"
+
+# execute the sd demo, with the prompt as a string and the output file as a string
+./SD.exe --prompt "A cat in a hat" --output "./assets/images/cat_in_a_hat.png"
+```
+
+Note that the whisper demo will only work with .wav files of 16kHz sample rate. 
